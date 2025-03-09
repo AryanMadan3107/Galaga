@@ -6,14 +6,18 @@ HEIGHT=600
 galaga=Actor("galaga")
 galaga.pos=(400,550)
 bugs=[]
-for i in range(5):
-    bug=Actor("bug")
-    bugs.append(bug)
-    bugs[-1].x=20+55*i
-    bugs[-1].y=0
+for l in range(2):
+    for i in range(5):
+        bug=Actor("bug")
+        bugs.append(bug)
+        bugs[-1].x=20+55*i
+        bugs[-1].y=40*l
 d=1
 md=False
 bullets=[]
+score=0
+bugr=[]
+bulletr=[]
 
 def draw():
     screen.fill("#ba03fc")
@@ -22,9 +26,13 @@ def draw():
         bug.draw()
     for bullet in bullets:
         bullet.draw()
+    screen.draw.text(str(score),(20,20))
+    if len(bugs)==0:
+        screen.draw.text("You win!",(300,300), fontsize=100)
 
 def update():
-    global d, md
+    global d, md, score
+    md = False
     if keyboard.left:
         galaga.x-=10
         if galaga.x<=50:
@@ -33,17 +41,32 @@ def update():
         galaga.x+=10
         if galaga.x>=750:
             galaga.x=750
-    if bugs[0].x<20 or bugs[-1].x>780:
+    if len(bugs)>0 and (bugs[0].x<20 or bugs[-1].x>780):
         d=d*-1
         md=True
+
+    
+    bulletr.clear()
+    bugr.clear()
+
     for bug in bugs:
-        bug.x+=d*1
-        if md==True:
- #   for bug in bugs:    
-            if bug.y<=HEIGHT:
-                bug.y+=1        
+        bug.x+=d*3
+        if md:
+            bug.y+=10
+        for bullet in bullets:
+            if bug.colliderect(bullet):
+                bugr.append(bug)
+                bulletr.append(bullet)
+                score+=1
+    for bug in bugr:
+        if bug in bugs:
+            bugs.remove(bug)
+    for bullet in bulletr:
+        if bullet in bullets:
+            bullets.remove(bullet)
+
     for bullet in bullets:
-        bullet.y-=5
+        bullet.y-=3
 
 def on_key_down(key):
     if key == keys.SPACE:
@@ -51,7 +74,5 @@ def on_key_down(key):
         bullets.append(bullet)
         bullet.x=galaga.x
         bullet.y=galaga.y-37 
-    
-
 
 pgzrun.go()
