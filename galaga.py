@@ -18,8 +18,10 @@ bullets=[]
 score=0
 bugr=[]
 bulletr=[]
+gameover=False
 
 def draw():
+    global gameover
     screen.fill("#ba03fc")
     galaga.draw()
     for bug in bugs:
@@ -29,9 +31,13 @@ def draw():
     screen.draw.text(str(score),(20,20))
     if len(bugs)==0:
         screen.draw.text("You win!",(300,300), fontsize=100)
+    if gameover==True:
+        screen.fill("orange")
+        screen.draw.text("You died, this is what you scored: "+ str(score),center=(400,300),fontsize=50,color="blue")
+    
 
 def update():
-    global d, md, score
+    global d, md, score, gameover
     md = False
     if keyboard.left:
         galaga.x-=10
@@ -44,13 +50,16 @@ def update():
     if len(bugs)>0 and (bugs[0].x<20 or bugs[-1].x>780):
         d=d*-1
         md=True
+    for bug in bugs:
+        if bug.colliderect(galaga):
+           gameover=True
 
     
     bulletr.clear()
     bugr.clear()
 
     for bug in bugs:
-        bug.x+=d*3
+        bug.x+=d*10  
         if md:
             bug.y+=10
         for bullet in bullets:
